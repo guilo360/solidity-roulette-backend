@@ -10,6 +10,7 @@ contract rouletteWheel {
 
     //holds what colour each number (represented by an index value) is
     //I think this is more memory eficient than a mapping?
+    //maybe impliment a custom colour type wrapping a string
     string[] wheelcolour;
 
     constructor() {
@@ -29,4 +30,19 @@ contract rouletteWheel {
         }
     }
 
+//In Progress
+
+/*
+
+    function spin() public 
+    returns (uint number) {
+
+    }
+
+    function getColour (uint _number)
+    returns (string colour) {
+        return wheelcolour[_number];
+    }
+
+*/
 }
