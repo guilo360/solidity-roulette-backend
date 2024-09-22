@@ -25,7 +25,7 @@ contract random {
     returns (uint randomInRange) 
     {
         uint hash = randHash();
-        return hash % (_high + 1) + _low;
+        return hash % (_high + 1 - _low) + _low;
     }
 
 }
