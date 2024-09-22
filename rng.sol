@@ -10,14 +10,15 @@ contract random {
     function randHash() public view
     returns (uint _randomhash)
     {
-        uint seed = block.timestamp;
+        bytes32 seed = blockhash(block.number);
         return uint256(bytes32(keccak256(abi.encodePacked(seed))));
 
     }
 
 //turns the above hash function into a random number within the range (high) and (low)
 //This is implimented this way so that alternative random hash functions can be implimented without breaking other code
-//note - due to the nature of the blockchain any waiting till a new block has been mined should be handeled by the front end
+//note - due to the nature of the blockchain any waiting till a new block has been mined should be handeled by the front end.
+//Following this, this function will then be called to generate a random number.
 
 
     function randNumber(uint _low, uint _high) public view
