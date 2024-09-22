@@ -2,6 +2,7 @@
 pragma solidity ^0.8.0;
 
 import "rng.sol";
+import "hardhat/console.sol"
 
 contract rouletteWheel {
 
