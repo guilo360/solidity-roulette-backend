@@ -4,24 +4,23 @@ pragma solidity ^0.8.0;
 //this contract is a library of random number functions that will be used by the roulette contract
 
 contract random {
-
+    uint calledBefore;
 //This function only gets the current blocks hash, and is an insecure random hash generator
 
-    function randHash() public view
+    function randHash() public 
     returns (uint _randomhash)
     {
-        bytes32 seed = blockhash(block.number);
+        bytes32 seed = bytes32(block.timestamp + calledBefore);
+        calledBefore++;
         return uint256(bytes32(keccak256(abi.encodePacked(seed))));
 
     }
 
 //turns the above hash function into a random number within the range (high) and (low)
 //This is implimented this way so that alternative random hash functions can be implimented without breaking other code
-//note - due to the nature of the blockchain any waiting till a new block has been mined should be handeled by the front end.
-//Following this, this function will then be called to generate a random number.
-
-
-    function randNumber(uint _low, uint _high) public view
+//only works for numbers >0
+//a full library would be better but this suits for the roulette wheel
+    function randNumber(uint _low, uint _high) external 
     returns (uint randomInRange) 
     {
         uint hash = randHash();
