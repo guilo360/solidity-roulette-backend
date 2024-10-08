@@ -6,13 +6,14 @@ import "gambling_interface.sol";
 
 contract rouletteWheel is gambling{
     //Variables:
-    uint wheelSize = 36;
+    uint wheelSize = 35;
+    uint zeroes = 2;
 
 //Main functions
     //a partially complete implimentation of spinning the wheel
     function spin() public 
     returns (uint number) {
-         uint returnedIntegerValue = Irandom(msg.sender).randNumber(0,36);
+         uint returnedIntegerValue = Irandom(Ihouse(houseAddress).randomSource()).randNumber(1,wheelsize+zeroes);
          return  returnedIntegerValue;
     }
 
