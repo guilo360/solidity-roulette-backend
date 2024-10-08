@@ -13,7 +13,6 @@ contract random {
         bytes32 seed = bytes32(block.timestamp + calledBefore);
         calledBefore++;
         return uint256(bytes32(keccak256(abi.encodePacked(seed))));
-
     }
 
 //turns the above hash function into a random number within the range (high) and (low)
@@ -21,10 +20,10 @@ contract random {
 //only works for numbers >0
 //a full library would be better but this suits for the roulette wheel
     function randNumber(uint _low, uint _high) external 
-    returns (uint randomInRange) 
+    returns (uint8 randomInRange) 
     {
         uint hash = randHash();
-        return hash % (_high + 1 - _low) + _low;
+        return uint8(hash % (_high + 1 - _low) + _low);
     }
 
 }
