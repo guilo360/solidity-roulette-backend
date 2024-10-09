@@ -6,7 +6,7 @@ import "gambling_interface.sol";
 
 contract rouletteWheel is gambling{
     //Variables:
-    uint8 wheelSize = 35;
+    uint8 wheelSize = 36;
     uint8 zeroes = 2;
     uint64 public maxBet = 1000000;
     uint64 public minBet = 1000;
