@@ -35,7 +35,7 @@ contract gambling {
     }
     //validate bet value
     modifier validBet(uint64 value, uint8 multiplier) {
-        require(value < 2**64/multiplier, "Bet not possible - Payout would be more than max tokens"); //ensure payout is less than max int
+        require(value < 18446744073709551615/multiplier, "Bet not possible - Payout would be more than max tokens"); //ensure payout is less than max int
         uint64 payout = value * multiplier;
         require(Ihouse(houseAddress).userTokens(msg.sender) >= value, "Bet not possible - User can't afford bet"); //user has funds
         require(Ihouse(houseAddress).userTokens(msg.sender) + payout < 2**64, "Bet not possible - Bet would put user over max tokens"); //bet would not overcap tokens
