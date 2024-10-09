@@ -2,6 +2,8 @@
 pragma solidity ^0.8.0;
 
 //this contract is a library of random number functions that will be used by the roulette contract
+// INSECURE RANDOM GENERATOR - True random generation is out of scope for this assignment.
+
 
 contract random {
     uint calledBefore;

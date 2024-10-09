@@ -14,7 +14,8 @@ contract cho_han is gambling{
     //Modifiers:
 
     modifier betInRange(uint64 value) {
-        require(value <= maxBet && value >= minBet);
+        require(value <= maxBet && value >= minBet, string(abi.encodePacked("best must be between ", uint2str(minBet), " and ", uint2str(maxBet))));
+        require(value % (10000/house_edge) == 0, string(abi.encodePacked("bet must be a multiple of ", uint2str(10000/house_edge))));
         _;
     }
 
@@ -26,19 +27,15 @@ contract cho_han is gambling{
          return  returnedIntegerValue;
     }
 
-    //moves bet tokens from user to house, pays out minus house edge if user bet is correct, returns die rolls
-    function bet(uint64 value, bool betIsEven) validBet(value) betInRange(value) public returns(uint8, uint8) {
-        Ihouse(houseAddress).collectUserTokens(value, msg.sender);
+    //makes bet if it's valid, returns die roll for front end
+    function bet( bool betIsEven, uint64 value) validBet(value, 1) betInRange(value) public returns(uint8, uint8) {
+        uint64 payout = Ihouse(houseAddress).holdTokens(value, msg.sender, value - (value * house_edge/10000));
         uint8 die1Value = uint8(roll());
         uint8 die2Value = uint8(roll());
         bool rollIsEven = ((die1Value + die2Value) % 2 == 0);
         if (rollIsEven == betIsEven){
-            Ihouse(houseAddress).payUserTokens((2 * value - (value * house_edge/ 10000)), msg.sender);
+            Ihouse(houseAddress).payUserTokens(payout, msg.sender);
         }
         return(die1Value, die2Value);
-    }
-
-    function test() public view returns(uint256){
-        return(Ihouse(houseAddress).houseTokens());
     }
 }

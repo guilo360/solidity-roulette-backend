@@ -8,7 +8,7 @@ contract gamblingHouse{
 
     //Variables:
     address owner = msg.sender;
-    address public randomSource = 0xBDB44b8360bdeBF255713dd0A6AdfeD0b4BB33CF; //modify before publishing or using function
+    address public randomSource = 0xF7c72F54eD6efbdF3fd076527E312E5652Aa148b; //modify before publishing or using function
     mapping (address => uint64) public userTokens;
     uint256 public houseTokens;
     uint256 fractionalTokens;
@@ -26,13 +26,6 @@ contract gamblingHouse{
 
     modifier onlyInterface() {
         require(allowedInterfaces.contains(msg.sender), "Not interface");
-        _;
-    }
-
-    modifier validBet(address user, uint64 value){
-        require(userTokens[user] >= value, "Bet not possible - User can't afford bet"); //user has funds
-        require(userTokens[user] + value < 2**64, "Bet not possible - Bet would put user over max tokens"); //bet would not overcap tokens
-        require(houseTokens>=value, "Bet not possible - House can't afford payout"); //house can afford to pay out win
         _;
     }
 
@@ -72,15 +65,18 @@ contract gamblingHouse{
         userTokens[msg.sender] += count;
     }
 
-    //move user tokens to house for bet
-    function collectUserTokens(uint64 count, address user) public onlyInterface validBet(user, count){
-        userTokens[user] -= count;
-        houseTokens += count;
+    //hold tokens for payout at start of bet - return value should be fed into payUserTokens on a win
+    function holdTokens(uint64 payUser, address user, uint64 payHouse) public onlyInterface returns(uint64 payout){
+        require(houseTokens >= payHouse, "Insufficient house tokens");
+        require(userTokens[user] >= payUser, "Insufficient user tokens");
+        houseTokens -= payHouse;
+        userTokens[user] -= payUser;
+        return(payUser + payHouse);
     }
-    //pay tokens from house to user account
-    function payUserTokens(uint64 count, address user) public onlyInterface validBet(user, count) {
+
+    //pay tokens into user account - should be used in tandem with holdTokens and count should be equal to holdTokens return value 
+    function payUserTokens(uint64 count, address user) public onlyInterface{
         userTokens[user] += count;
-        houseTokens -= count;
     }
 
     //cash out user tokens for eth
@@ -96,18 +92,6 @@ contract gamblingHouse{
         houseTokens -= count;
         uint256 amountToSend = count * weiPerToken;
         account.transfer(amountToSend);
-    }
-
-
-
-    //TO BE REMOVED - added for convenience of remix testing to give specific button rather than using low level interactions
-    function donate() public payable{
-        fractionalTokens += msg.value % weiPerToken;
-        houseTokens += msg.value / weiPerToken;
-        if(fractionalTokens >= weiPerToken){
-            fractionalTokens-weiPerToken;
-            houseTokens++;
-        }
     }
 
     // Function to receive Ether. msg.data must be empty

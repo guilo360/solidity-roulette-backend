@@ -8,33 +8,41 @@ contract rouletteWheel is gambling{
     //Variables:
     uint8 wheelSize = 35;
     uint8 zeroes = 2;
+    uint64 public maxBet = 1000000;
+    uint64 public minBet = 1000;
+   
+
+    //Modifiers:
+
+    modifier betInRange(uint64 value) {
+        require(value <= maxBet && value >= minBet, string(abi.encodePacked("best must be between ", uint2str(minBet), " and ", uint2str(maxBet))));
+        _;
+    }
 
 
-//Main functions
-    //a partially complete implimentation of spinning the wheel
+
+    //Main functions
+   
+    //spin the wheel, returning a location on the wheel, with anything higher than wheelSize acting as a 0 value (does not return 0)
     function spin() public 
     returns (uint8 number) {
          uint8 returnedIntegerValue = Irandom(Ihouse(houseAddress).randomSource()).randNumber(1,wheelSize+zeroes);
          return  returnedIntegerValue;
     }
 
-    function getBalance() public view returns (uint){
-        return address(this).balance;
-    }
-
-    //functional bet code no payout - bet is made as array of applicable values - frontend API likely beneficial.
-    //technically allows non-standard bets, but payouts would be calculated at same rates as standard anyway.
-    //actual gambling functionality still to be implemented
-    function bet(uint8[] calldata option, uint64 rate) public returns (bool win, uint8 outcome){
+    //functional bet code - bet is made as array of applicable values - frontend API likely beneficial.
+    //technically allows non-standard bets, but payouts would be calculated at same rates as standard anyway - same price point.
+    //returns result for front end use
+    function bet(uint8[] calldata option, uint64 rate) validBet(rate, (wheelSize/uint8(option.length))) betInRange(rate) public returns (uint8 outcome){
         require(option.length < 19 && option.length > 0, "Invalid bet length");
+        uint64 payout = Ihouse(houseAddress).holdTokens(rate, msg.sender, rate*(wheelSize/uint8(option.length)));
         uint8 result = spin();
-        uint8 payout = (wheelSize / uint8(option.length));
         for(uint8 i=0; i < option.length; i++){
             if (option[i] == result){
-                return(true, result);
+          Ihouse(houseAddress).payUserTokens(payout, msg.sender);
             }
         }
-        return (false, result);
+        return (result);
     }
 //useful information: https://ethereum.stackexchange.com/questions/109530/calling-function-from-another-contract
 }
