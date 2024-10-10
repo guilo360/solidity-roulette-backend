@@ -8,7 +8,7 @@ contract gamblingHouse{
 
     //Variables:
     address owner = msg.sender;
-    address public randomSource = 0xF7c72F54eD6efbdF3fd076527E312E5652Aa148b; //modify before publishing or using function
+    address public randomSource = 0xFb3C40a2F3a57a7DB3D8Cfa050a0fDa7Aed8399F; //modify before publishing or using function
     mapping (address => uint64) public userTokens;
     uint256 public houseTokens;
     uint256 fractionalTokens;
@@ -65,7 +65,7 @@ contract gamblingHouse{
         userTokens[msg.sender] += count;
     }
 
-    //hold tokens for payout at start of bet - return value should be fed into payUserTokens on a win
+    //hold tokens for payout at start of bet - return value should be fed into payOut on a win
     function holdTokens(uint64 payUser, address user, uint64 payHouse) public onlyInterface returns(uint64 payout){
         require(houseTokens >= payHouse, "Insufficient house tokens");
         require(userTokens[user] >= payUser, "Insufficient user tokens");
@@ -75,8 +75,13 @@ contract gamblingHouse{
     }
 
     //pay tokens into user account - should be used in tandem with holdTokens and count should be equal to holdTokens return value 
-    function payUserTokens(uint64 count, address user) public onlyInterface{
+    function payOut(uint64 count, address user) public onlyInterface{
+        if(user == address(this)){
+            houseTokens += count;
+        }
+        else{
         userTokens[user] += count;
+        }
     }
 
     //cash out user tokens for eth

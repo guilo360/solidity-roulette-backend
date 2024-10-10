@@ -28,14 +28,18 @@ contract cho_han is gambling{
     }
 
     //makes bet if it's valid, returns die roll for front end
-    function bet( bool betIsEven, uint64 value) validBet(value, 1) betInRange(value) public returns(uint8, uint8) {
+    function bet( bool betIsEven, uint64 value) validBet(value, 1) betInRange(value) public returns(uint8, uint8, bool) {
         uint64 payout = Ihouse(houseAddress).holdTokens(value, msg.sender, value - (value * house_edge/10000));
         uint8 die1Value = uint8(roll());
         uint8 die2Value = uint8(roll());
         bool rollIsEven = ((die1Value + die2Value) % 2 == 0);
         if (rollIsEven == betIsEven){
-            Ihouse(houseAddress).payUserTokens(payout, msg.sender);
+            Ihouse(houseAddress).payOut(payout, msg.sender);
+            return(die1Value, die2Value, true);
         }
-        return(die1Value, die2Value);
+        else{
+            Ihouse(houseAddress).payOut(payout, houseAddress);
+            return(die1Value, die2Value, false);
+        }
     }
 }

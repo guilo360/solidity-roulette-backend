@@ -14,7 +14,7 @@ interface Ihouse{
     function buyTokens(uint64 count, address user) external payable;
     function holdTokens(uint64 payUser, address user, uint64 payHouse) external returns(uint64);
     function userTokens(address user) external view returns(uint64);
-    function payUserTokens(uint64 count, address user) external;
+    function payOut(uint64 count, address user) external;
     function randomSource() external view returns(address);
 }
 
@@ -22,7 +22,7 @@ contract gambling {
 
     //Variables:
     address owner = msg.sender;
-    address payable houseAddress = payable(0x6b8588E0BaAa2a027F0c7A5bA201D009bC76E459); //needs to be set after the gambling house contract is live
+    address payable houseAddress = payable(0x430d082e46091173B8A4f9f48752e16e3A3a4c62); //needs to be set after the gambling house contract is live
 
 
     //Modifiers - https://solidity-by-example.org/function-modifier/
@@ -35,7 +35,7 @@ contract gambling {
     }
     //validate bet value
     modifier validBet(uint64 value, uint8 multiplier) {
-        require(value < 18446744073709551615/multiplier, "Bet not possible - Payout would be more than max tokens"); //ensure payout is less than max int
+        require(value < 2**64/multiplier, "Bet not possible - Payout would be more than max tokens"); //ensure payout is less than max int
         uint64 payout = value * multiplier;
         require(Ihouse(houseAddress).userTokens(msg.sender) >= value, "Bet not possible - User can't afford bet"); //user has funds
         require(Ihouse(houseAddress).userTokens(msg.sender) + payout < 2**64, "Bet not possible - Bet would put user over max tokens"); //bet would not overcap tokens

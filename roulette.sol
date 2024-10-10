@@ -6,7 +6,7 @@ import "gambling_interface.sol";
 
 contract rouletteWheel is gambling{
     //Variables:
-    uint8 wheelSize = 36;
+    uint8 wheelSize = 35;
     uint8 zeroes = 2;
     uint64 public maxBet = 1000000;
     uint64 public minBet = 1000;
@@ -39,9 +39,11 @@ contract rouletteWheel is gambling{
         uint8 result = spin();
         for(uint8 i=0; i < option.length; i++){
             if (option[i] == result){
-          Ihouse(houseAddress).payUserTokens(payout, msg.sender);
+                Ihouse(houseAddress).payOut(payout, msg.sender);
+                return(result);
             }
         }
+        Ihouse(houseAddress).payOut(payout, houseAddress);
         return (result);
     }
 //useful information: https://ethereum.stackexchange.com/questions/109530/calling-function-from-another-contract
